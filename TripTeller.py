@@ -49,10 +49,9 @@ def txt_to_docx(txt_file, docx_file,town):
     section.top_margin = Inches(0.4)
     section.bottom_margin = Inches(0.4)
 
-     # Add title page
     title_paragraph = document.add_paragraph()
     title_paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    title_run = title_paragraph.add_run("Exploring " + town)
+    title_run = title_paragraph.add_run(f"Exploring {town}")
     title_run.font.size = Pt(18)
     title_run.bold = True
     title_paragraph.add_run("\n\nYour Guide to History, Culture, and Fun")
@@ -73,7 +72,14 @@ def txt_to_docx(txt_file, docx_file,town):
     dedication_paragraph = document.add_paragraph()
     dedication_paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
     dedication_paragraph.add_run("Dedication\n\n")
-    dedication_paragraph.add_run(PR("Please write me 1 paragraph for the dedication of a history, culture, reference, and travel guide for " + town + ", considering it was written by one person and should be a generic dedication to travelers and explorers.", "You are a professional writer for Lonely Planet writing the dedication page of a book about the history, culture, reference, and travel guide for small town of " + town + ".Make sure to vary your words and grammar so phrases do not repeat too much.", 0.5, 1024)).italic = True
+    dedication_paragraph.add_run(
+        PR(
+            f"Please write me 1 paragraph for the dedication of a history, culture, reference, and travel guide for {town}, considering it was written by one person and should be a generic dedication to travelers and explorers.",
+            f"You are a professional writer for Lonely Planet writing the dedication page of a book about the history, culture, reference, and travel guide for small town of {town}.Make sure to vary your words and grammar so phrases do not repeat too much.",
+            0.5,
+            1024,
+        )
+    ).italic = True
     document.add_page_break()
 
     # Read the input text file
@@ -92,10 +98,15 @@ def txt_to_docx(txt_file, docx_file,town):
             heading.alignment = WD_ALIGN_PARAGRAPH.CENTER
             headers = {
                 "Content-Type": "application/json",
-                "Authorization": f"Bearer api_key"
+                "Authorization": "Bearer api_key",
             }
-            imgprompt = PR("I want you to write a DALL-E image generation prompt to generate an image related to " + title + " in the town of " + town, "You write image generation prompts for DALL-E from the given input request. For example, if you were asked to write a prompt for an image about the geography of Damascus, Virginia, you may output: Mountainous terrain with dense forests and trees, peaceful and serene, in the vicinity of Damascus, VA, USA. Shot on a Canon EOS R6 with a Canon RF 24-105mm f/4L IS USM Lens, 4K film still, natural lighting, vibrant colors, crisp details, and soft shadows.", 0.5, 2048)
-            print("Generating Image For: " + title + " : " + town)
+            imgprompt = PR(
+                f"I want you to write a DALL-E image generation prompt to generate an image related to {title} in the town of {town}",
+                "You write image generation prompts for DALL-E from the given input request. For example, if you were asked to write a prompt for an image about the geography of Damascus, Virginia, you may output: Mountainous terrain with dense forests and trees, peaceful and serene, in the vicinity of Damascus, VA, USA. Shot on a Canon EOS R6 with a Canon RF 24-105mm f/4L IS USM Lens, 4K film still, natural lighting, vibrant colors, crisp details, and soft shadows.",
+                0.5,
+                2048,
+            )
+            print(f"Generating Image For: {title} : {town}")
             data = {
                 "prompt": imgprompt,
                 "n": 1,
@@ -151,8 +162,8 @@ towns = read_towns_csv('towns.csv')
 nouse=input();
 
 for town_name, state in towns:
-    town = town_name + ", " + state
-    savefile = town_name + " " + state + ".txt"
+    town = f"{town_name}, {state}"
+    savefile = f"{town_name} {state}.txt"
 
     book = [
         # Chapter 1
@@ -234,19 +245,29 @@ for town_name, state in towns:
 
     total_chars = 0
     total_words = 0
-    total_sections = sum([len(c) for c in book])
+    total_sections = sum(len(c) for c in book)
     completed_sections = 0
 
-    print("Title: Exploring "+town+": Your Guide to History, Culture, and Fun")
+    print(f"Title: Exploring {town}: Your Guide to History, Culture, and Fun")
 
     for i, chapter in enumerate(book):
         for j, section in enumerate(chapter):
-            print("Writing About The " + ShortBook[i][j] + " of " + town)
-            if(j==0):
-                prompt = "Write me a 1 paragraph brief introduction for a chapter about the " + ShortBook[i][j] + " of " + town + "."
+            print(f"Writing About The {ShortBook[i][j]} of {town}")
+            if (j==0):
+                prompt = f"Write me a 1 paragraph brief introduction for a chapter about the {ShortBook[i][j]} of {town}."
             else:
-                prompt = "Write me 8-10 extensive detailed and informative paragraphs about the " + ShortBook[i][j] + " of " + town + ". Only write strictly about " + ShortBook[i][j] + " and do not progess into any other topics/eras/areas/sections that lie outside of the " + ShortBook[i][j] + "."
-            response = "\n\n" + book[i][j] + "\n" + PR(prompt, "You are a professional travel guide writer writing a book about the small town of " + town + ". You are asked to write a section for a book, and take care to not write any more than appropriate for the chapters topic, and not write past the strict topic. Only write strictly about " + ShortBook[i][j] + " and do not progess into any other topics/eras/areas/sections that lie outside of the " + ShortBook[i][j] + ". Remember, the town has already been introduced in earlier sections, so you don't have to give the reader an intro to the towns location or basic data, unless the chapter calls for it. For reference about the other topics so you know what to and not to write about, here is a list of the chapters in order: Purpose of the book,Early Settlement,Development and Growth,Notable Events and People,Modern Era,Physical Location,Topography,Climate,Natural Resources,Population,Ethnicity and Culture,Education,Income and Employment,Local Government Structure,Key Officials and Representatives,Political Affiliations,Major Political Issues,Major Industries and Employers,Small Business Scene,Agriculture,Tourism,Community Events and Traditions,Local Landmarks and Attractions,Arts and Entertainment,Sports and Recreation,Transportation,Healthcare,Education and Libraries,Utilities and Public Services,Reflection on the Town's Uniqueness and Character,Final Thoughts and Recommendations.Make sure to vary your words and grammar so phrases do not repeat too much.Make sure to only include factual informaation.", 0.5, 2048)
+                prompt = f"Write me 8-10 extensive detailed and informative paragraphs about the {ShortBook[i][j]} of {town}. Only write strictly about {ShortBook[i][j]} and do not progess into any other topics/eras/areas/sections that lie outside of the {ShortBook[i][j]}."
+            response = (
+                "\n\n"
+                + book[i][j]
+                + "\n"
+                + PR(
+                    prompt,
+                    f"You are a professional travel guide writer writing a book about the small town of {town}. You are asked to write a section for a book, and take care to not write any more than appropriate for the chapters topic, and not write past the strict topic. Only write strictly about {ShortBook[i][j]} and do not progess into any other topics/eras/areas/sections that lie outside of the {ShortBook[i][j]}. Remember, the town has already been introduced in earlier sections, so you don't have to give the reader an intro to the towns location or basic data, unless the chapter calls for it. For reference about the other topics so you know what to and not to write about, here is a list of the chapters in order: Purpose of the book,Early Settlement,Development and Growth,Notable Events and People,Modern Era,Physical Location,Topography,Climate,Natural Resources,Population,Ethnicity and Culture,Education,Income and Employment,Local Government Structure,Key Officials and Representatives,Political Affiliations,Major Political Issues,Major Industries and Employers,Small Business Scene,Agriculture,Tourism,Community Events and Traditions,Local Landmarks and Attractions,Arts and Entertainment,Sports and Recreation,Transportation,Healthcare,Education and Libraries,Utilities and Public Services,Reflection on the Town's Uniqueness and Character,Final Thoughts and Recommendations.Make sure to vary your words and grammar so phrases do not repeat too much.Make sure to only include factual informaation.",
+                    0.5,
+                    2048,
+                )
+            )
             num_chars = len(response)
             num_words = len(response.split(' '))
             total_chars += num_chars
@@ -276,12 +297,25 @@ for town_name, state in towns:
     ]
 
     for title, prompt in ref_sec:
-        print("Writing " + title[5:] + " For " + town, end="")
-        response = "\n\n" + title + "\n" + PR(prompt, "You are a professional travel guide writer writing the extensive detailed reference section and tourism guide portion of a book about the small town of " + town + ".Make sure to vary your words and grammar so phrases do not repeat too much.Make sure to only include factual information (although this also includes any local legends, myths, cryptoids, or other culturly relevant legends).", 0.45, 2048, 0.05, 0.05)
+        print(f"Writing {title[5:]} For {town}", end="")
+        response = (
+            "\n\n"
+            + title
+            + "\n"
+            + PR(
+                prompt,
+                f"You are a professional travel guide writer writing the extensive detailed reference section and tourism guide portion of a book about the small town of {town}"
+                + ".Make sure to vary your words and grammar so phrases do not repeat too much.Make sure to only include factual information (although this also includes any local legends, myths, cryptoids, or other culturly relevant legends).",
+                0.45,
+                2048,
+                0.05,
+                0.05,
+            )
+        )
         char_count = len(response)
         word_count = len(response.split())
         APD(response, savefile)
-        print("          Saved. " + str(char_count) + " CHAR, " + str(word_count) + " WORDS")   
+        print("          Saved. " + str(char_count) + " CHAR, " + str(word_count) + " WORDS")
     outputfile = savefile.replace('.txt', '.docx')
     txt_to_docx(savefile,outputfile,town)
     generate_amazon_description(savefile,town)
